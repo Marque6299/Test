@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fare Difference Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="main-content" role="main">
+            <h1>Fare Difference Calculator</h1>
+            
+            <button class="clear-fields-button" id="clear-fields-button">Clear Fields</button>
+            
+            <div class="controls">
+                <div class="input-group">
+                    <label for="baseOldFare">Base Old Fare:</label>
+                    <input type="number" id="baseOldFare" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="input-group">
+                    <label for="baseNewFare">Base New Fare:</label>
+                    <input type="number" id="baseNewFare" placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="input-group">
+                    <label for="flexibilitySelect">Flexibility:</label>
+                    <select id="flexibilitySelect">
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div id="airlinePenaltyRow" class="input-group" style="display: none;">
+                  <label for="airlinePenalty">Airline Penalty:</label>
+                  <input type="number" id="airlinePenalty" placeholder="0.00" min="0" step="0.01">
+                </div>
+                
+                <div id="serviceFeeRow" class="input-group" style="display: none;">
+                  <label for="serviceFee">Service Fee:</label>
+                  <input type="number" id="serviceFee" placeholder="0.00" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tax Type</th>
+                            <th>Old Fare</th>
+                            <th>New Fare</th>
+                            <th>Difference</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taxTableBody">
+                        <tr id="taxRow1">
+                            <td><input type="text" id="taxType1" maxlength="2" class="tax-type"></td>
+                            <td><input type="number" id="oldFare1" placeholder="0.00" min="0" step="0.01"></td>
+                            <td><input type="number" id="newFare1" placeholder="0.00" min="0" step="0.01"></td>
+                            <td id="taxDiff1" class="currency">0.00</td>
+                            <td><button class="remove-tax-button" onclick="removeTaxRow(1)">Remove</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button id="addTaxButton" class="add-tax-button">Add Tax Row</button>
+
+            <div id="maxTaxAlert" class="alert" style="display: none;">
+                Maximum number of tax rows reached.
+            </div>
+        </div>
+
+        <div class="side-panel">
+            <div class="notes">
+                <h4>Notes</h4>
+                <ul>
+                    <li>All penalties and difference must be charged following the Quouted curreny in your GDS tool.</li>
+                    <li>All calculations are per traveller.</li>
+                </ul>
+            </div>
+
+            <div class="summary">
+                <div class="summary-header">
+                    <h2>Summary</h2>
+                    <button id="copyButton" class="copy-button" title="Copy Summary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="summary-item">
+                    <span>Base Fare Difference:</span>
+                    <span id="totalBaseFare" class="currency">0.00</span>
+                </div>
+
+                <div id="Penaltysummary" class="summary-item">
+                  Airline Penalty: <span id="airlinePenaltySummary" class="currency">0.00</span>
+                </div>
+                
+                <div id="Servicefeesummary" class="summary-item">
+                  Service Fee: <span id="serviceFeesSummary" class="currency">0.00</span>
+                </div>
+
+                <div id="taxBreakdown" class="tax-breakdown">
+                    <h3>Tax Breakdown</h3>
+                    <div class="tax-list"></div>
+                </div>
+
+                <div class="summary-item">
+                    <span>Overall Tax Difference:</span>
+                    <span id="taxDifference" class="currency">0.00</span>
+                </div>
+
+                <div class="summary-item total">
+                    <span>Total Fare Difference:</span>
+                    <span id="totalFareDiff" class="currency">0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </div>
+        <div class="footer-copyright">
+            © 2024 Fare Calculator ||Global MIS Application|| Molina J.M.
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
