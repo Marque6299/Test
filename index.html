@@ -3,137 +3,444 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fare Difference Calculator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap" rel="stylesheet">
+    <title>ETG Chat Script Manager</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="main-content" role="main">
-            <h1>Fare Difference Calculator</h1>
-            
-            <button class="clear-fields-button" id="clear-fields-button">Clear Fields</button>
-            
-            <div class="controls">
-                <div class="input-group">
-                    <label for="baseOldFare">Base Old Fare:</label>
-                    <input type="number" id="baseOldFare" placeholder="0.00" min="0" step="0.01">
-                </div>
-                <div class="input-group">
-                    <label for="baseNewFare">Base New Fare:</label>
-                    <input type="number" id="baseNewFare" placeholder="0.00" min="0" step="0.01">
-                </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <h2>Interaction Details</h2>
+                <button id="closeSidebar" class="close-sidebar-btn">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
-            <div class="controls">
-                <div class="input-group">
-                    <label for="flexibilitySelect">Flexibility:</label>
-                    <select id="flexibilitySelect">
-                        <option value="Yes">Yes</option>
-                        <option value="No">No</option>
-                    </select>
+            <div class="sidebar-content">
+                <div class="form-group">
+                    <label for="agentName">Agent Name</label>
+                    <input type="text" id="agentName" class="form-input" placeholder="Agent name..">
                 </div>
-                <div id="airlinePenaltyRow" class="input-group" style="display: none;">
-                  <label for="airlinePenalty">Airline Penalty:</label>
-                  <input type="number" id="airlinePenalty" placeholder="0.00" min="0" step="0.01">
+
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input type="text" id="customerName" class="form-input" placeholder="Customer name..">
                 </div>
-                
-                <div id="serviceFeeRow" class="input-group" style="display: none;">
-                  <label for="serviceFee">Service Fee:</label>
-                  <input type="number" id="serviceFee" placeholder="0.00" min="0" step="0.01">
-                </div>
+                <button id="clearForm" class="btn btn-secondary">Clear All</button>
             </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="app-header">
+                <button id="sidebarToggle" class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tax Type</th>
-                            <th>Old Fare</th>
-                            <th>New Fare</th>
-                            <th>Difference</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="taxTableBody">
-                        <tr id="taxRow1">
-                            <td><input type="text" id="taxType1" maxlength="2" class="tax-type"></td>
-                            <td><input type="number" id="oldFare1" placeholder="0.00" min="0" step="0.01"></td>
-                            <td><input type="number" id="newFare1" placeholder="0.00" min="0" step="0.01"></td>
-                            <td id="taxDiff1" class="currency">0.00</td>
-                            <td><button class="remove-tax-button" onclick="removeTaxRow(1)">Remove</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="logo">
+                    <h1>ETG Chat Script</h1>
+                </div>
+
+                <div class="header-actions">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search scripts...">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                    <a href="https://mis-ghostjm.github.io/GLBMIS/" target="_blank" class="fd-calculator-link">
+                        <i class="fas fa-calculator"></i> FD Calculator
+                    </a>
+                </div>
+            </header>
+
+            <nav class="main-nav">
+                <button id="opening-nav" class="nav-btn active">Opening</button>
+                <button id="helpful-statements-nav" class="nav-btn" style="display: none;">Helpful Statements</button>
+                <button id="closing-nav" class="nav-btn" style="display: none;">Closing</button>
+                <button id="hold-nav" class="nav-btn" style="display: none;">Hold</button>
+                <button id="payment-nav" class="nav-btn">Payment</button>
+                <button id="objections-nav" class="nav-btn">Handling Objections</button>
+                <button id="change-nav" class="nav-btn" style="display: none;">Change</button>
+                <button id="refunds-nav" class="nav-btn">Refunds</button>
+                <button id="refund-delay-nav" class="nav-btn">Refund Delays</button>
+                <button id="cancel-nav" class="nav-btn" style="display: none;">Cancel</button>
+                <button id="schedule-change-nav" class="nav-btn" style="display: none;">Schedule Change</button>
+                <button id="name-correction-nav" class="nav-btn" style="display: none;">Name Correction</button>
+                <button id="yy-contact-nav" class="nav-btn" style="display: none;">YY Contact</button>
+                <button id="csat-scripts-nav" class="nav-btn">C-Sat Scripts</button>
+            </nav>
+
+            <div class="sections-container">
+                <!-- Opening Section -->
+                <section id="opening-section" class="interaction-section active">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>Asking for Order Number</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
+                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                To assist you, I will need your order number.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Chat Opening (asking to wait)</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
+                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                Please give me a moment to review your request.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Chat Opening (asking to state the request)</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
+                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                How may I help you with your booking?
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When the customer doesn't have the order number</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                To assist you, I need to find your booking first. Please provide one of the following:<br> 
+                                E-ticket number:<br>
+                                Booking / airline reference number:<br>
+                                Transaction number / approval code:
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Order not found</h3>
+                            <p>(potentially booked with other provider)</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We're sorry to inform you that the booking reference does not match a ticket purchased through our website. 
+                                It appears that your ticket was acquired through another company. 
+                                If you have any additional questions or concerns, please don't hesitate to reach out to us again.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Payment-->
+                <section id="payment-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                                <h3>When sending payment link on email</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! I have shared a payment link on your registered email address. 
+                                Please make the payment and let me know.  You can use the link within the next 5 minutes to complete the payment. 
+                                Please be aware that not responding within this timeframe will result in this chat being disconnected. 
+                                If you cannot access the payment link or have any other questions, please let me know, and I'll be happy to assist you.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When sending payment link in chatbox</h3>
+                    </div>
+                    <div class="section-scripts">
+                        <div class="script-card">
+                            Thank you, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! I've included a payment link in this chat window. 
+                            Please open the link in a separate browser tab without closing the chat. You can use the link within the next 5 minutes to complete the payment. 
+                            Please be aware that not responding within this timeframe will result in this chat being disconnected. If you cannot access the payment link or have any other questions, please let me know, and I'll be happy to assist you.
+                        </div>
+                    </div>
+                        <div class="section-headers">
+                            <h3>Payment successfully received</h3>
+                            <p>(for Baggage/Seating/Special equipment)</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span> for your payment. 
+                                Within 24 hours, you’ll receive an email confirming your <span class="manual-edit" data-default-text="(Baggage/seating/special)" onclick="enableTextEdit(this)">(Baggage/seating/special)</span>,
+                                 linked to your airline reference number. If you don't see the confirmation in your inbox, please check your spam folder.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When the customer is not ready to make the payment within 30 minutes</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                No problem at all, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>. 
+                                Please note the payment will expire after 30 minutes. You may contact us again when you're ready to make the payment so we can send you the new link.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Refunds-->
+                <section id="refunds-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>The customer is asking for the status of their refund</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                You can check your refund status by logging in to "My Bookings", which you can access through the top right corner of our site.
+                            </div>
+                            <div class="script-card">
+                                Log in with Facebook or Google if you used your linked email account to make the booking or enter your order number and the email you used when booking.
+                            </div>
+                            <div class="script-card">
+                                Once logged on to "My Bookings" you will be able to see the latest information about your refund.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>My friend who booked with another agency already got their refund, when will I get mine?</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                As a result of the sudden increase in refund requests, 
+                                we as a company are trying to complete as many requests as possible every day. 
+                                We have appointed the maximum available additional staffing to ensure that we handle all the requests with the highest possible priority. 
+                                We are handling all the requests by date of submission, however, there are other factors that influence the waiting time and the outcome itself, such as if, and how quickly we are able to retrieve the funds from the airline. 
+                                We assure you that we are doing our best to help all our customers as soon as possible.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>when the customer is inquiring on the refund status and we have given all possible information</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We have already provided all the available information regarding your refund status. 
+                                To stay updated, please visit the "My Bookings" page on our website. Unfortunately, 
+                                our support team is unable to assist you further at this time.
+                            </div>
+                            <div class="script-card">
+                                Thank you for your patience and understanding. 
+                                We're working diligently to process your refund as quickly as possible. 
+                                We apologize for any inconvenience this may have caused.
+                            </div>
+                            <div class="script-card">
+                                Due to the high volume of customer inquiries, we must now close this chat. 
+                                If you have any other questions or concerns, please don't hesitate to reach out to us again. Have a great day!
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Refund Delays-->
+                <section id="refund-delay-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>But how long do I have to wait?</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                While I don't have an exact timeframe at the moment, please be assured that processing your refund is a top priority for us. As an intermediary of the airline, we are unable to confirm the refund timeframe, as we have to wait for the refund from the airline. 
+                                Refunds typically undergo a thorough review process, which can vary based on several factors including payment method, bank processing times, and any specific policies related to your booking. 
+                                Rest assured, we are actively working to expedite the process as much as possible. 
+                                Our refund team will notify you via email once the refund is processed. 
+                                You may also check the refund status on our website under the 'My Bookings' section. 
+                                We appreciate your patience and truly value your business.
+                            </div>
+                            <div class="script-card">
+                                Refund timelines can vary, but we're here to ensure a smooth process! On average, it takes them 5 business days to process these, and once we receive those funds, our internal processing takes about 6 days. 
+                                This means you can expect to see your refund within 10-15 business days. We're committed to transparency and will keep you informed every step of the way.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When will I get my refund. It has been days/months I am waiting for my refund</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We totally get how frustrating it can be when things take longer than expected, and we're really sorry if this delay has caused any inconvenience to you. 
+                                Rest assured, we're doing all we can to speed up this refund process. Normally, once we get the go-ahead from the airline, we aim to sort it out within about 6 days. But sometimes, delays beyond our control can be caused. 
+                                Thanks for bearing with us while we get this sorted. We genuinely appreciate your patience and understanding during this time. 
+                                Refund timelines can vary, but we're here to ensure a smooth process! On average, it takes them 5 business days to process these, and once we receive those funds, our internal processing takes about 6 days. 
+                                This means you can expect to see your refund within 10-15 business days. We're committed to transparency and will keep you informed every step of the way.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Handling Objections-->
+                <section id="objections-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                                <h3>Objection on  ETG service fee</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Our service fee covers your case handling, including all necessary communication and administrative work with the airline. 
+                                As your travel agency, we’re committed to managing all paperwork and follow-up to ensure that the process is handled smoothly. 
+                                Please feel free to reach out if you have any additional questions regarding this matter.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>If customer has an objection when referred to the airline</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                As your travel agency, we're here to make your booking experience as smooth as possible and assist with your travel needs. 
+                                While we can help with most inquiries, like itinerary changes and general questions, there are some cases where you'll need to contact the airline directly. 
+                                This is due to airline policies that require their intervention. Rest assured, we’ll continue to support you in any way we can to ensure your trip goes smoothly.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>The case is already with Support and we are waiting for airline reply</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Our team is still waiting for a response from the airline. We will get back to you as soon as we have an update.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When the refund process takes more than 15 business days</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We totally understand how frustrating it can be when things take longer than expected, and we're really sorry if this delay has caused any inconvenience to you. 
+                                Rest assured, we're doing all we can to speed up this refund process. Normally, once we get the go-ahead from the airline, we aim to sort it out within about 6 days. 
+                                But sometimes, delays beyond our control can happen. Please kindly note, any extra delay might not be our fault—sometimes it's down to how quickly your bank processes the refund once we've sent it over. Thanks for bearing with us while we get this sorted. 
+                                We genuinely appreciate your patience and understanding during this time. If you've got any other questions or need a hand with anything else, just let us know. We're here to help!
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>If customer has an objection on airline costs</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                <span>The price of a ticket is based on demand and set by the airline – the fare is higher for the date and time you are choosing than the ticket you originally paid for. 
+                                If you are flexible, I can search for 2 to 3 different travel dates/times for a lesser fare difference. Would you like me to do that?</span>
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>The customer keeps pushing back after the agent has repeatedly tried educating the customer in regards to their refund delay</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I acknowledge your frustration but we have already provided all the information we have. 
+                                I regret that I will need to disconnect this chat, 
+                                which is inevitable due to many other customers waiting in our queues. 
+                                We are doing our best in order to get your refund. 
+                                Therefore I'm going to disconnect the chat, 
+                                thank you for understanding.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When customer agrees to a supervisor call within the next 24H</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>.  One of our supervisors will contact you at the phone number provided within 24 hours.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>I will sue your company</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We totally understand your point of view, however, 
+                                we would like to assure you that we have already taken all the necessary actions regarding your request and no further actions are required from your side.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Will I get compensation?</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                While we may understand the reason for your request we do not handle any compensation-related requests over the telephone. 
+                                You may submit your request through our contact form and our Customer Relations team will investigate and reply accordingly
+                            </div>
+                            <div class="script-card">
+                                Please take into consideration that due to increased volumes it might take some time until you receive a response.
+                            </div>
+                        </div>                          
+                    </div>
+                </section>
+                <!-- C-Sat Section -->
+                <section id="csat-scripts-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>FOLLOW HOLD PROCEDURE</h3>
+                            <p>update the customer on a timely manner (within 5 minutes)</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you for waiting <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>. I am now checking the <span class="manual-edit" data-default-text="[reason for hold]" onclick="enableTextEdit(this)">[reason for hold]</span> and would be needing more time. It won't take more than 5 minutes
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>WHEN PLACING CUSTOMER ON HOLD </h3>
+                            <p>Explain the reason why you are putting the customer on hold / or the activities being conducted.</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I am currently checking the <span class="manual-edit" data-default-text="[reason for hold]" onclick="enableTextEdit(this)">[reason for hold]</span>. Please allow me more time.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>APOLOGIZE FOR LONG OR MULTIPLE HOLDS</h3>
+                            <p>Apologize and explain why the transaction is taking so much time. Always respect customers time</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I apologize for taking so much of your time and I appreciate your patience with me today. I am making sure that I am processing this correctly thus I will need a few more minutes to work on this.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <div class="section-header">
+                                <h3>Closing - CHAT ABOVE 15 TO 20 MIN (Resolved/Unresolved Cases)</h3>
+                                <p>Apologize for the long transaction and that you are doing your best to help the customer</p>
+                                <p>Apologize for the long transaction and that you are doing your best to help the customer</p>
+                            </div>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I am doing my best to resolve your <span class="manual-edit" data-default-text="[customer request]" onclick="enableTextEdit(this)">[customer request]</span> thus it took sometime to process it. I sincerely apologize and thank you for your patience.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Closing - APOLOGIZE AND THANK THE CUSTOMER BEFORE CLOSING THE CHAT</h3>
+                            <p>Before closing the chat (long duration) apologize and thank the customer</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                It was a pleasure to assist you today and I apologize for the long process. I truly appreciate your patience staying online with me.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>TRANSFER CUSTOMER TO SCHEDULE CHANGE TEAM</h3>
+                            <p>Briefly explain that you want to help but due to some reason (provide the reason) you need to transfer schedule team</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I’d really love to help you with the <span class="manual-edit" data-default-text="[customer request]" onclick="enableTextEdit(this)">[customer request]</span>, however, I need to transfer your chat to our schedule change team who can assist you better.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Send to Support Cases</h3>
+                            <p>Briefly explain that you want to help but due to some reason (provide the reason), you need to send the request to our concern team</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I’d really love to help you with the <span class="manual-edit" data-default-text="[customer request]" onclick="enableTextEdit(this)">[customer request]</span>, however,  I need to send this request to our concern team who can assist you better.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>REFERRING THE CUSTOMER TO AIRLINE</h3>
+                            <p>Briefly explain that you want to help but due to some reason (specify the reason example ticket is in airlines control or instruction in Document Tab states that the customer need to contact the airline)</p>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I would love to assist you with your <span class="manual-edit" data-default-text="[customer request]" onclick="enableTextEdit(this)">[customer request]</span>, however the airline [brief reason why] thus we’re unable to proceed. Please reach out to the airline for this request.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- More sections can be added similarly -->
             </div>
+        </main>
 
-            <button id="addTaxButton" class="add-tax-button">Add Tax Row</button>
-
-            <div id="maxTaxAlert" class="alert" style="display: none;">
-                Maximum number of tax rows reached.
-            </div>
-        </div>
-
-        <div class="side-panel">
-            <div class="notes">
-                <h4>Notes</h4>
-                <ul>
-                    <li>All penalties and difference must be charged following the Quouted curreny in your GDS tool.</li>
-                    <li>All calculations are per traveller.</li>
-                </ul>
-            </div>
-
-            <div class="summary">
-                <div class="summary-header">
-                    <h2>Summary</h2>
-                    <button id="copyButton" class="copy-button" title="Copy Summary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="summary-item">
-                    <span>Base Fare Difference:</span>
-                    <span id="totalBaseFare" class="currency">0.00</span>
-                </div>
-
-                <div id="Penaltysummary" class="summary-item">
-                  Airline Penalty: <span id="airlinePenaltySummary" class="currency">0.00</span>
-                </div>
-                
-                <div id="Servicefeesummary" class="summary-item">
-                  Service Fee: <span id="serviceFeesSummary" class="currency">0.00</span>
-                </div>
-
-                <div id="taxBreakdown" class="tax-breakdown">
-                    <h3>Tax Breakdown</h3>
-                    <div class="tax-list"></div>
-                </div>
-
-                <div class="summary-item">
-                    <span>Overall Tax Difference:</span>
-                    <span id="taxDifference" class="currency">0.00</span>
-                </div>
-
-                <div class="summary-item total">
-                    <span>Total Fare Difference:</span>
-                    <span id="totalFareDiff" class="currency">0.00</span>
-                </div>
-            </div>
-        </div>
+        <!-- Tooltip -->
+        <div id="tooltip" class="tooltip">Copied!</div>
     </div>
-
-    <footer>
-        <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-        </div>
-        <div class="footer-copyright">
-            © 2024 Fare Calculator ||Global MIS Application|| Molina J.M.
-        </div>
-    </footer>
 
     <script src="script.js"></script>
 </body>
