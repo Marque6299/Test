@@ -1,360 +1,475 @@
-//Constants
-const CONSTANTS = {
-  MAX_TAX_ROWS: 25,
-  DEBOUNCE_DELAY: 300,
-  MIN_TAX_ROWS: 1,
-  COPY_SUCCESS_DURATION: 1000
-};
+document.addEventListener('DOMContentLoaded', () => {
+    // Configuration constants
+    const CONFIG = {
+        TOOLTIP_DURATION: 2000,
+        ANIMATION_DURATION: 300,
+        SEARCH_DEBOUNCE_TIME: 300
+    };
 
-// State management
-const state = {
-  taxRowCount: 1,
-  calculations: {
-    baseFareDiff: 0,
-    taxBreakdown: {},
-    overallTaxDiff: 0,
-    totalFareDiff: 0,
-    airlinePenalty: 0,
-    penalties: {
-      airlinePenalty: 0,
-      serviceFee: 0
-    }
-  }
-};
+    // Utility query selectors
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => document.querySelectorAll(selector);
 
-// Utility functions
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      func(...args);
-    }, wait);
-  };
-}
+    // Application State Management
+    class AppState {
+        constructor() {
+            this.formData = { 
+                agentName: '', 
+                customerName: '', 
+                intent: '' 
+            };
+        }
 
-function formatCurrency(value) {
-  const numValue = parseFloat(value) || 0;
-  return numValue.toFixed(2);
-}
+        // Update form data and placeholders
+        updateFormData(key, value) {
+            this.formData[key] = value;
+            this.updatePlaceholders();
+        }
 
-function safeCalculation(calculation) {
-  try {
-    return calculation();
-  } catch (error) {
-    console.error('Calculation error:', error);
-    return 0;
-  }
-}
+        // Reset form data
+        resetFormData(preserveAgentName = true) {
+            if (preserveAgentName) {
+                this.formData.customerName = '';
+                this.formData.intent = '';
+            } else {
+                this.formData = { 
+                    agentName: '', 
+                    customerName: '', 
+                    intent: '' 
+                };
+            }
+            this.updatePlaceholders();
+        }
 
-// Copy functionality
-function createTooltip(message) {
-  const tooltip = document.createElement('div');
-  tooltip.className = 'copy-tooltip';
-  tooltip.textContent = message;
-  document.body.appendChild(tooltip);
-  return tooltip;
-}
-
-function positionTooltip(tooltip, targetElement) {
-  const rect = targetElement.getBoundingClientRect();
-  tooltip.style.top = `${rect.top - tooltip.offsetHeight - 8}px`;
-  tooltip.style.left = `${rect.left + (rect.width - tooltip.offsetWidth) / 2}px`;
-}
-
-function showTooltip(message, targetElement, duration = 2000) {
-  const tooltip = createTooltip(message);
-  positionTooltip(tooltip, targetElement);
-
-  setTimeout(() => {
-    tooltip.style.opacity = '0';
-    setTimeout(() => tooltip.remove(), 50);
-  }, duration);
-}
-
-function generateSummaryText() {
-  const flexibilityValue = document.getElementById("flexibilitySelect").value;
-  const penalties = state.calculations.penalties;
-
-  let summaryText = "Ticket Change Summary\n";
-  summaryText += "=======================\n";
-
-  // Base fare section
-  summaryText += `Base Fare Difference: ${document.getElementById("totalBaseFare").innerText}`;
-
-  // Penalties section if applicable
-  if (flexibilityValue === "No") {
-    summaryText += `\nAirline Penalty: ${formatCurrency(penalties.airlinePenalty)}\n`;
-    summaryText += `Service Fee: ${formatCurrency(penalties.serviceFee)}`;
-  }
-
-  // Tax breakdown section
-  summaryText += `\nOverall Tax Difference: ${document.getElementById("taxDifference").innerText}\n`;
-  summaryText += "=======================\n";
-  summaryText += `Total Fare Difference: ${document.getElementById("totalFareDiff").innerText}\n`;
-  summaryText += "***Tax Breakdown****\n";
-  Object.entries(state.calculations.taxBreakdown).forEach(([taxType, difference]) => {
-    summaryText += `${taxType}: ${formatCurrency(difference)}\n`;
-  });
-  return summaryText;
-}
-
-async function handleCopy() {
-  const copyButton = document.getElementById('copyButton');
-  const flexibilityValue = document.getElementById("flexibilitySelect").value;
-  const airlinePenalty = document.getElementById("airlinePenalty").value;
-  const serviceFee = document.getElementById("serviceFee").value;
-
-  // Check if flexibility is No and if inputs are empty
-  if (flexibilityValue === "No" && (!airlinePenalty || !serviceFee)) {
-    copyButton.classList.add('error');
-    showTooltip('Please fill in Airline Penalty and Service Fee', copyButton);
-    setTimeout(() => {
-      copyButton.classList.remove('error');
-    }, CONSTANTS.COPY_SUCCESS_DURATION);
-    return; // Exit the function if inputs are invalid
-  }
-
-  const summaryText = generateSummaryText();
-
-  try {
-    await navigator.clipboard.writeText(summaryText);
-    copyButton.classList.add('success');
-    showTooltip('Copied!', copyButton);
-
-    setTimeout(() => {
-      copyButton.classList.remove('success');
-    }, CONSTANTS.COPY_SUCCESS_DURATION);
-  } catch (err) {
-    copyButton.classList.add('error');
-    showTooltip('Failed to copy', copyButton);
-
-    setTimeout(() => {
-      copyButton.classList.remove('error');
-    }, CONSTANTS.COPY_SUCCESS_DURATION);
-  }
-}
-
-// DOM Utility functions
-function createTaxBreakdownItem(taxType, difference) {
-  const taxItem = document.createElement('div');
-  taxItem.className = 'tax-item';
-  taxItem.innerHTML = `
-      <span class="tax-type-label">${taxType || 'Unknown'} Tax:</span>
-      <span class="tax-amount currency">${formatCurrency(difference)}</span>
-  `;
-  return taxItem;
-}
-
-function updateTaxBreakdownDisplay() {
-  const taxList = document.querySelector('.tax-list');
-  taxList.innerHTML = '';
-
-  Object.entries(state.calculations.taxBreakdown)
-    .filter(([_, value]) => value !== 0)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([taxType, difference]) => {
-      taxList.appendChild(createTaxBreakdownItem(taxType, difference));
-    });
-
-  if (taxList.children.length === 0) {
-    taxList.innerHTML = '<div class="tax-item empty">No tax differences calculated</div>';
-  }
-}
-
-// Calculation functions
-function calculateBaseFareDifference() {
-  return safeCalculation(() => {
-    const baseOldFare = parseFloat(document.getElementById("baseOldFare").value) || 0;
-    const baseNewFare = parseFloat(document.getElementById("baseNewFare").value) || 0;
-
-    let baseFareDiff = baseNewFare - baseOldFare;
-    state.calculations.baseFareDiff = baseFareDiff;
-    document.getElementById("totalBaseFare").innerText = formatCurrency(baseFareDiff);
-
-    return baseFareDiff;
-  });
-}
-
-function calculateTotalFareDifference() {
-  const totalBaseFare = calculateBaseFareDifference();
-  const totalTaxDifference = calculateTaxDifferences();
-
-  let totalFareDiff = 0;
-  if (totalBaseFare < 0) {
-    totalFareDiff = Math.max(state.calculations.penalties.airlinePenalty + state.calculations.penalties.serviceFee + totalTaxDifference, 0);
-  } else {
-    totalFareDiff = Math.max(totalBaseFare + totalTaxDifference, 0);
-  }
-
-  state.calculations.totalFareDiff = totalFareDiff;
-  document.getElementById("totalFareDiff").innerText = formatCurrency(state.calculations.totalFareDiff);
-}
-
-function calculateTaxDifferences() {
-  state.calculations.taxBreakdown = {};
-  let totalTaxDiff = 0;
-
-  for (let i = 1; i <= state.taxRowCount; i++) {
-    const row = document.getElementById(`taxRow${i}`);
-    if (!row) continue;
-
-    const taxType = document.getElementById(`taxType${i}`).value.toUpperCase();
-    const oldFare = parseFloat(document.getElementById(`oldFare${i}`).value) || 0;
-    const newFare = parseFloat(document.getElementById(`newFare${i}`).value) || 0;
-    const difference = newFare - oldFare;
-
-    if (taxType && difference !== 0) {
-      state.calculations.taxBreakdown[taxType] = difference;
-      if (difference > 0) {
-        totalTaxDiff += difference;
-      }
+        // Update placeholder texts across the application
+        updatePlaceholders() {
+            $$('.customer_name').forEach(el => {
+                el.textContent = this.formData.customerName || '[Cx name]';
+            });
+            $$('.agent_name').forEach(el => {
+                el.textContent = this.formData.agentName || '[Agent name]';
+            });
+            $$('.intent').forEach(el => {
+                el.textContent = this.formData.intent || '[intent]';
+            });
+        }
     }
 
-    document.getElementById(`taxDiff${i}`).innerText = formatCurrency(difference);
-  }
+    // UI Management Class
+    class UIManager {
+        constructor(state) {
+            this.state = state;
+            this.inactivityTimeout = null;
+            this.initEventListeners();
+            this.setupTouchSwipeHandling();
+        }
 
-  state.calculations.overallTaxDiff = totalTaxDiff;
-  document.getElementById("taxDifference").innerText = formatCurrency(totalTaxDiff);
+        // Initialize all event listeners
+        initEventListeners() {
+            // Sidebar toggle
+            $('#sidebarToggle')?.addEventListener('click', () => this.toggleSidebar());
+            $('#closeSidebar')?.addEventListener('click', () => this.toggleSidebar());
+            
+            $('#sidebar')?.addEventListener('mousemove', () => this.resetInactivityTimer());
+            $('#sidebar')?.addEventListener('mousedown', () => this.resetInactivityTimer());
+            $('#sidebar')?.addEventListener('keydown', () => this.resetInactivityTimer());
+            document.addEventListener('click', (e) => this.handleOutsideClick(e));
+            
 
-  updateTaxBreakdownDisplay();
+            // Form input handling
+            $$('.form-input').forEach(input => {
+                input.addEventListener('input', e => {
+                    this.state.updateFormData(e.target.id, e.target.value);
+                });
+            });
 
-  return totalTaxDiff;
-}
+            // Clear form button
+            $('#clearForm')?.addEventListener('click', () => this.clearForm());
 
-// Row management functions
-function addTaxRow() {
-  if (state.taxRowCount < CONSTANTS.MAX_TAX_ROWS) {
-    state.taxRowCount++;
-    const newRow = document.createElement("tr");
-    newRow.id = `taxRow${state.taxRowCount}`;
-    newRow.innerHTML = `
-        <td><input type="text" id="taxType${state.taxRowCount}" maxlength="2" class="tax-type"></td>
-        <td><input type="number" id="oldFare${state.taxRowCount}" placeholder="0.00" min="0" step="0.01"></td>
-        <td><input type="number" id="newFare${state.taxRowCount}" placeholder="0.00" min="0" step="0.01"></td>
-        <td id="taxDiff${state.taxRowCount}" class="currency">0.00</td>
-        <td><button class="remove-tax-button" onclick="removeTaxRow(${state.taxRowCount})">Remove</button></td>
-    `;
-    document.getElementById("taxTableBody").appendChild(newRow);
-    bindTaxRowEvents(newRow);
+            // Navigation buttons
+            $$('.nav-btn').forEach(button => {
+                button.addEventListener('click', () => this.handleNavigation(button));
+            });
 
-    document.getElementById("maxTaxAlert").style.display =
-      state.taxRowCount >= CONSTANTS.MAX_TAX_ROWS ? "block" : "none";
-  }
-}
+            // Search input with debounce
+            $('.search-input')?.addEventListener('input', this.debounce(e => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                this.performSearch(searchTerm);
+            }, CONFIG.SEARCH_DEBOUNCE_TIME));
 
-function removeTaxRow(rowNumber) {
-  if (state.taxRowCount <= CONSTANTS.MIN_TAX_ROWS) return;
+            // Escape key to close sidebar
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') this.toggleSidebar();
+            });
+        }
 
-  const row = document.getElementById(`taxRow${rowNumber}`);
-  if (row) {
-    row.remove();
-    state.taxRowCount--;
-    document.getElementById("maxTaxAlert").style.display = "none";
-    calculateTotalFareDifference();
-  }
-}
+        // Debounce utility function
+        debounce(func, delay) {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
 
-function bindTaxRowEvents(row) {
-  const inputs = row.querySelectorAll('input');
-  inputs.forEach(input => {
-    input.addEventListener('input', debounce(calculateTotalFareDifference, CONSTANTS.DEBOUNCE_DELAY));
-  });
-}
+        // Toggle sidebar visibility
+        toggleSidebar() {
+            const sidebar = $('#sidebar');
+            const sidebarToggle = $('#sidebarToggle');
+            
+            sidebar.classList.toggle('open');
+            sidebarToggle.classList.toggle('active');
+            
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+            sidebarToggle.setAttribute('aria-expanded', sidebar.classList.contains('open'));
+    
+            if (sidebar.classList.contains('open')) {
+                // Start the inactivity timer when the sidebar is opened
+                this.startInactivityTimer();
+            } else {
+                // Clear the inactivity timer when the sidebar is closed
+                this.clearInactivityTimer();
+            }
+        }
+    
+        // Start the inactivity timer
+        startInactivityTimer() {
+            this.clearInactivityTimer(); // Clear any existing timers first
+            this.inactivityTimeout = setTimeout(() => {
+                // Collapse the sidebar after a period of inactivity
+                this.toggleSidebar();
+            }, 5000); // Set to 5 seconds, or adjust as needed
+        }
+    
+        // Reset the inactivity timer when the user interacts with the sidebar
+        resetInactivityTimer() {
+            if (this.inactivityTimeout) {
+                clearTimeout(this.inactivityTimeout);
+                this.startInactivityTimer(); // Restart the timer on interaction
+            }
+        }
+    
+        // Clear the inactivity timer
+        clearInactivityTimer() {
+            if (this.inactivityTimeout) {
+                clearTimeout(this.inactivityTimeout);
+                this.inactivityTimeout = null;
+            }
+        }
 
-function handleFlexibilityChange() {
-  const flexibilitySelect = document.getElementById("flexibilitySelect").value;
-  const airlinePenaltyRow = document.getElementById("airlinePenaltyRow");
-  const serviceFeeRow = document.getElementById("serviceFeeRow");
+        handleOutsideClick(e) {
+            const sidebar = $('#sidebar');
+            const sidebarToggle = $('#sidebarToggle');
+            
+            if (sidebar.classList.contains('open')) {
+                // Check if the click was outside the sidebar or the toggle button
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    // If the click is not within a script-card, collapse the sidebar
+                    if (!e.target.closest('.script-card')) {
+                        this.toggleSidebar(); // Collapse sidebar
+                    }
+                }
+            }
+        }
 
-  // Determine display and requirement based on flexibility value
-  const display = flexibilitySelect === "No" ? "block" : "none";
-  airlinePenaltyRow.style.display = display;
-  serviceFeeRow.style.display = display;
+        // Clear form and reset manual edits
+        clearForm() {
+            this.state.resetFormData();
+            $$('.form-input').forEach(input => {
+                if (input.id !== 'agentName') input.value = '';
+            });
+        
+            // Reset manual edits on all script cards
+            $$('.script-card').forEach(card => {
+                resetManualEdits(card);
+            });
+        }
+        
+        // Handle navigation between sections
+        handleNavigation(button) {
+            $$('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+    
+            $$('.interaction-section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
 
-  // Clear previous error states
-  document.getElementById("airlinePenalty").setCustomValidity('');
-  document.getElementById("serviceFee").setCustomValidity('');
+                section.querySelectorAll('.section-headers, .section-scripts, .script-card').forEach(el => {
+                    el.style.display = '';
+                });
+            });
+    
+            const sectionId = button.id.replace('-nav', '-section');
+            const targetSection = $(`#${sectionId}`);
+            targetSection.classList.add('active');
+            targetSection.style.display = 'block';
+    
+            const searchInput = $('.search-input');
+            if (searchInput && searchInput.value.trim() !== '') {
+                this.performSearch(searchInput.value.toLowerCase().trim());
+            }
+        }
+        
+        performSearch(searchTerm) {
+            const sections = $$('.interaction-section');
+            const activeNavBtn = $('.nav-btn.active');
+            const activeSectionId = activeNavBtn.id.replace('-nav', '-section');
+            
+            if (searchTerm === '') {
+                // Reset visibility for all sections before showing active one
+                sections.forEach(section => {
+                    section.querySelectorAll('.section-headers, .section-scripts, .script-card').forEach(el => {
+                        el.style.display = ''; // Show all elements when search is cleared
+                    });
+                    section.style.display = section.id === activeSectionId ? 'block' : 'none';
+                });
+                return;
+            }
+            
+            sections.forEach(section => {
+                let sectionHasMatch = this.searchSectionHeaders(section, searchTerm);
+                section.style.display = sectionHasMatch ? 'block' : 'none';
+            });
+        }
+        
+        // Update searchSectionHeaders to also match within .script-card content
+        searchSectionHeaders(section, searchTerm) {
+            let sectionHasMatch = false;
+            
+            const headers = section.querySelectorAll('.section-headers');
+            const scriptCards = section.querySelectorAll('.script-card');
+            
+            // First, hide all section headers and script cards in the section
+            headers.forEach(header => {
+                header.style.display = 'none';
+            });
+            scriptCards.forEach(scriptCard => {
+                scriptCard.style.display = 'none';
+            });
+            
+            // Now, check if any header or script card matches
+            headers.forEach(header => {
+                const headerText = header.textContent.toLowerCase();
+                const headerMatch = headerText.includes(searchTerm);
+                
+                if (headerMatch) {
+                    header.style.display = ''; // Show header if it matches
+                    sectionHasMatch = true; // Mark section as having a match
+                }
+            });
+        
+            // Check if any script card matches and show the corresponding header and card
+            scriptCards.forEach(scriptCard => {
+                const scriptText = scriptCard.textContent.toLowerCase();
+                if (scriptText.includes(searchTerm)) {
+                    const header = scriptCard.closest('.section-headers'); // Find the parent header for the script card
+                    header.style.display = ''; // Show the parent header if the script card matches
+                    scriptCard.style.display = ''; // Show the matched script card
+                    sectionHasMatch = true; // Mark section as having a match
+                }
+            });
+        
+            return sectionHasMatch; // Return whether any content in the section matched
+        }
 
-  // Check for required fields when flexibility is "No"
-  if (flexibilitySelect === "No") {
-    const airlinePenalty = document.getElementById("airlinePenalty").value.trim();
-    const serviceFee = document.getElementById("serviceFee").value.trim();
+        setupTouchSwipeHandling() {
+            let touchStartX = 0;
 
-    if (!airlinePenalty) {
-      document.getElementById("airlinePenalty").setCustomValidity('Airline penalty is required.');
-      showTooltip('Airline penalty is required.', document.getElementById("airlinePenalty"));
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', e => {
+                const touchEndX = e.changedTouches[0].screenX;
+                const swipeDistance = touchEndX - touchStartX;
+                
+                const sidebar = $('#sidebar');
+                if (Math.abs(swipeDistance) > 100) {
+                    if (swipeDistance > 0 && !sidebar.classList.contains('open')) {
+                        sidebar.classList.add('open');
+                    } else if (swipeDistance < 0 && sidebar.classList.contains('open')) {
+                        sidebar.classList.remove('open');
+                    }
+                }
+            });
+        }
     }
 
-    if (!serviceFee) {
-      document.getElementById("serviceFee").setCustomValidity('Service fee is required.');
-      showTooltip('Service fee is required.', document.getElementById("serviceFee"));
+    // Enable text editing for manual edit spans
+    window.enableTextEdit = function(element) {
+        const currentText = element.innerText;
+        const defaultText = element.getAttribute('data-default-text');
+
+        if (currentText === defaultText) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = '';
+            input.classList.add('edit-input');
+
+            element.innerHTML = '';
+            element.appendChild(input);
+            input.focus();
+
+            input.addEventListener('input', function() {
+                synchronizeText(input.value, defaultText, element);
+            });
+            
+            input.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    saveEditedText(element, input);
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                saveEditedText(element, input);
+            });
+        }
+    };
+
+    function synchronizeText(value, defaultText, editedElement) {
+        const allSpans = document.querySelectorAll(`[data-default-text="${defaultText}"]`);
+        allSpans.forEach(span => {
+            if (span !== editedElement) {  // Skip the currently edited span
+                span.innerText = value || defaultText;  // Update all matching spans in real-time
+            }
+        });
     }
-  }
 
-  // Trigger recalculation of total fare difference
-  calculateTotalFareDifference();
-}
+    function saveEditedText(element, input) {
+        const newText = input.value.trim();
+        const defaultText = element.getAttribute('data-default-text');
 
-function clearFields() {
-  document.getElementById("baseOldFare").value = "";
-  document.getElementById("baseNewFare").value = "";
-  document.getElementById("airlinePenalty").value = "";
-  document.getElementById("serviceFee").value = "";
-
-  document.getElementById("flexibilitySelect").value = "Yes";
-  handleFlexibilityChange();
-
-  document.getElementById("taxTableBody").innerHTML = `
-      <tr id="taxRow1">
-          <td><input type="text" id="taxType1" maxlength="2" class="tax-type"></td>
-          <td><input type="number" id="oldFare1" placeholder="0.00" min="0" step="0.01"></td>
-          <td><input type="number" id="newFare1" placeholder="0.00" min="0" step="0.01"></td>
-          <td id="taxDiff1" class="currency">0.00</td>
-          <td><button class="remove-tax-button" onclick="removeTaxRow(1)">Remove</button></td>
-      </tr>
-  `;
-
-  state.taxRowCount = 1;
-  state.calculations = {
-    baseFareDiff: 0,
-    taxBreakdown: {},
-    overallTaxDiff: 0,
-    totalFareDiff: 0,
-    penalties: {
-      airlinePenalty: 0,
-      serviceFee: 0
+        element.innerHTML = newText || defaultText;
+        
+        synchronizeText(newText, defaultText, element);
     }
-  };
 
-  document.getElementById("totalBaseFare").innerText = "0.00";
-  document.getElementById("taxDifference").innerText = "0.00";
-  document.getElementById("totalFareDiff").innerText = "0.00";
-  updateTaxBreakdownDisplay();
+    function checkIfAllEdited(scriptCard) {
+        const manualEditSpans = scriptCard.querySelectorAll('.manual-edit');
+        for (let span of manualEditSpans) {
+            const currentText = span.innerText;
+            const defaultText = span.getAttribute('data-default-text');
+            if (currentText === defaultText) {
+                enableTextEdit(span);
+                return false;
+            }
+        }
+        return true;
+    }
 
-  document.getElementById("maxTaxAlert").style.display = "none";
+    function copyToClipboard(element) {
+        const spans = element.querySelectorAll('span');
+        let hasDefaultText = false;
+        let hasManualEdit = false;
 
-  bindTaxRowEvents(document.getElementById("taxRow1"));
-}
+        spans.forEach(span => {
+            const currentText = span.textContent.trim();
+            const defaultText = span.getAttribute('data-default-text');
+            if (currentText === defaultText && !span.classList.contains('manual-edit')) {
+                hasDefaultText = true;
+            }
+            if (span.classList.contains('manual-edit')) {
+                hasManualEdit = true;
+            }
+        });
 
-// Initialize event listeners
-document.addEventListener("DOMContentLoaded", () => {
-  // Bind main input events
-  const mainInputs = ["baseOldFare", "baseNewFare", "airlinePenalty", "serviceFee"];
-  mainInputs.forEach(id => {
-    document.getElementById(id).addEventListener('input',
-      debounce(calculateTotalFareDifference, CONSTANTS.DEBOUNCE_DELAY));
-  });
+        if (hasDefaultText) {
+            showTooltip(element, "Please update the form before copying.");
+            openSidebar();
+            return;
+        }
 
-  // Bind button events
-  document.getElementById("addTaxButton").addEventListener("click", addTaxRow);
-  document.querySelector(".clear-fields-button").addEventListener("click", clearFields);
-  document.getElementById("flexibilitySelect").addEventListener("change", handleFlexibilityChange);
-  document.getElementById("copyButton").addEventListener("click", handleCopy);
+        if (hasManualEdit) {
+            const allEdited = checkIfAllEdited(element);
+            if (!allEdited) return;
+        }
 
-  // Bind initial tax row events
-  bindTaxRowEvents(document.getElementById("taxRow1"));
+        const textToCopy = element.innerText || element.textContent;
 
-  // Initial calculations
-  calculateTotalFareDifference();
+        const tempTextArea = document.createElement('textarea');
+        tempTextArea.value = textToCopy;
+
+        document.body.appendChild(tempTextArea);
+        tempTextArea.select();
+        tempTextArea.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        document.body.removeChild(tempTextArea);
+
+        showTooltip(element, "Copied!");
+    }
+
+    function showTooltip(element, message) {
+        const tooltip = document.getElementById('tooltip');
+        const rect = element.getBoundingClientRect();
+
+        tooltip.textContent = message;
+
+        const tooltipWidth = tooltip.offsetWidth;
+        const tooltipHeight = tooltip.offsetHeight;
+
+        const topPosition = rect.top + window.scrollY - tooltipHeight - 10;
+        const leftPosition = rect.left + window.scrollX + rect.width / 2 - tooltipWidth / 2;
+
+        tooltip.style.top = `${Math.max(0, topPosition)}px`;
+        tooltip.style.left = `${Math.max(0, leftPosition)}px`;
+
+        tooltip.style.opacity = 1;
+
+        setTimeout(() => {
+            tooltip.style.opacity = 0;
+        }, CONFIG.TOOLTIP_DURATION);
+    }
+
+    function openSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebar.classList.add('open');
+        sidebarToggle.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        sidebarToggle.setAttribute('aria-expanded', true);
+    }
+
+    function resetManualEdits(card) {
+        const manualEditSpans = card.querySelectorAll('.manual-edit');
+        manualEditSpans.forEach(function(span) {
+            const defaultText = span.getAttribute('data-default-text');
+            span.innerHTML = defaultText;
+        });
+    }
+
+    function addResetButtonToScriptCards() {
+        document.querySelectorAll('.script-card').forEach(function(card) {
+            const manualEditSpans = card.querySelectorAll('.manual-edit');
+
+            if (manualEditSpans.length > 0) {
+                const resetButton = document.createElement('button');
+                resetButton.innerHTML = '<i class="fas fa-undo"></i>';
+                resetButton.classList.add('reset-btn');
+                resetButton.type = 'button';
+
+                resetButton.addEventListener('click', function() {
+                    resetManualEdits(card);
+                });
+
+                card.appendChild(resetButton);
+            }
+        });
+    }
+
+    function attachCopyFunctionality() {
+        document.querySelectorAll('.script-card').forEach(function(card) {
+            card.addEventListener('click', function(event) {
+                if (event.target.classList.contains('manual-edit')) return;
+                copyToClipboard(card);
+            });
+        });
+    }
+
+    const appState = new AppState();
+    const uiManager = new UIManager(appState);
+    
+    addResetButtonToScriptCards();
+    attachCopyFunctionality();
+    appState.updatePlaceholders();
 });
