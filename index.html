@@ -12,7 +12,7 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-header">
-                <h2>Interaction Details</h2>
+                <h2><i class="fas fa-sliders-h"></i> Interaction Details</h2>
                 <button id="closeSidebar" class="close-sidebar-btn">
                     <i class="fas fa-times"></i>
                 </button>
@@ -35,36 +35,31 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="app-header">
-                <button id="sidebarToggle" class="sidebar-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-
                 <div class="logo">
-                    <h1>ETG Chat Script</h1>
+                    <h1><i class="fas fa-comments"></i>ETG Chat Script</h1>
                 </div>
-
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search scripts...">
+                    <button class="times-icon"><i class="fas fa-times"></i></button>
+                </div>
                 <div class="header-actions">
-                    <div class="search-container">
-                        <input type="text" class="search-input" placeholder="Search scripts...">
-                        <i class="fas fa-search search-icon"></i>
-                    </div>
-                    <a href="https://mis-ghostjm.github.io/GLBMIS/" target="_blank" class="fd-calculator-link">
+                    <button class="header-link-button"><a href="https://mis-ghostjm.github.io/GLBMIS/" target="_blank" class="fd-calculator-link">
                         <i class="fas fa-calculator"></i> FD Calculator
-                    </a>
+                    </a></button>
                 </div>
             </header>
 
             <nav class="main-nav">
                 <button id="opening-nav" class="nav-btn active">Opening</button>
                 <button id="helpful-statements-nav" class="nav-btn" style="display: none;">Helpful Statements</button>
-                <button id="closing-nav" class="nav-btn" style="display: none;">Closing</button>
-                <button id="hold-nav" class="nav-btn" style="display: none;">Hold</button>
+                <button id="closing-nav" class="nav-btn">Closing</button>
+                <button id="hold-nav" class="nav-btn">Hold</button>
                 <button id="payment-nav" class="nav-btn">Payment</button>
                 <button id="objections-nav" class="nav-btn">Handling Objections</button>
-                <button id="change-nav" class="nav-btn" style="display: none;">Change</button>
+                <button id="change-nav" class="nav-btn">Change</button>
                 <button id="refunds-nav" class="nav-btn">Refunds</button>
                 <button id="refund-delay-nav" class="nav-btn">Refund Delays</button>
-                <button id="cancel-nav" class="nav-btn" style="display: none;">Cancel</button>
+                <button id="cancel-nav" class="nav-btn">Cancel</button>
                 <button id="schedule-change-nav" class="nav-btn" style="display: none;">Schedule Change</button>
                 <button id="name-correction-nav" class="nav-btn" style="display: none;">Name Correction</button>
                 <button id="yy-contact-nav" class="nav-btn" style="display: none;">YY Contact</button>
@@ -80,8 +75,8 @@
                         </div>
                         <div class="section-scripts">
                             <div class="script-card">
-                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
-                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                Hello, <span class="manual-edit" data-default-text="[Cx Name]" onclick="enableTextEdit(this)">[Cx Name]</span>! 
+                                My name is <span class="manual-edit" data-default-text="[Agent Name]" onclick="enableTextEdit(this)">[Agent Name]</span>. 
                                 To assist you, I will need your order number.
                             </div>
                         </div>
@@ -90,8 +85,8 @@
                         </div>
                         <div class="section-scripts">
                             <div class="script-card">
-                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
-                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                Hello, <span class="manual-edit" data-default-text="[Cx Name]" onclick="enableTextEdit(this)">[Cx Name]</span>! 
+                                My name is <span class="manual-edit" data-default-text="[Agent Name]" onclick="enableTextEdit(this)">[Agent Name]</span>. 
                                 Please give me a moment to review your request.
                             </div>
                         </div>
@@ -100,8 +95,8 @@
                         </div>
                         <div class="section-scripts">
                             <div class="script-card">
-                                Hello, <span class="customer_name" data-default-text="[Cx name]">[Cx name]</span>! 
-                                My name is <span class="agent_name" data-default-text="[Agent name]">[Agent name]</span>. 
+                                Hello, <span class="manual-edit" data-default-text="[Cx Name]" onclick="enableTextEdit(this)">[Cx Name]</span>! 
+                                My name is <span class="manual-edit" data-default-text="[Agent Name]" onclick="enableTextEdit(this)">[Agent Name]</span>. 
                                 How may I help you with your booking?
                             </div>
                         </div>
@@ -129,6 +124,83 @@
                         </div>
                     </div>
                 </section>
+                <!--Closing-->
+                <section id="closing-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>Thanking and checking if customer needs any further help</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                It was a pleasure to have assisted you today . Would there be anything else I can help you with?
+                            </div>
+                            <div class="script-card">
+                                I'm glad I have been able to assist you today. Please let me know if you have any further questions or concerns.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>The customer is already unhappy with our service we need to use this script instead of using a standard closing script</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We apologize for the inconvenience, but we're unable to assist you at this moment. 
+                                Your satisfaction is important to us, and we're continuously striving to improve our service. 
+                                Please feel free to reach out in the future for any assistance. This chat will now close.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>To use when the customer doesn't respond for 2 minutes. Send it and wait for another 3 minutes</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I didn't receive any response, and I want to make sure we're still connected. 
+                                Let me know by responding to the chat. 
+                                Otherwise, this chat will close in 3 minutes.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Close chat after no response for 5 minutes</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I still haven't received any response, and it seems that you are no longer connected. 
+                                This chat will now be closed. 
+                                If you need further assistance, please start a new chat. Thank you.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Closing END-->
+                <!--Hold Start-->
+                <section id="hold-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>Putting customer on hold</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Please give me a moment to review your information. It won't take more than 5 minutes.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Refresh Hold</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you for waiting. But I will need 5 more minutes to work on your request.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Customer Proceed with request</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you. Please give me a moment to process your request. I will need an additional 5 minutes, please.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Hold END-->
                 <!--Payment-->
                 <section id="payment-section" class="interaction-section">
                     <div class="section-grid">
@@ -175,6 +247,7 @@
                         </div>
                     </div>
                 </section>
+                <!--Payment End-->
                 <!--Refunds-->
                 <section id="refunds-section" class="interaction-section">
                     <div class="section-grid">
@@ -225,6 +298,7 @@
                         </div>
                     </div>
                 </section>
+                <!--Refund END-->
                 <!--Refund Delays-->
                 <section id="refund-delay-section" class="interaction-section">
                     <div class="section-grid">
@@ -257,13 +331,181 @@
                                 This means you can expect to see your refund within 10-15 business days. We're committed to transparency and will keep you informed every step of the way.
                             </div>
                         </div>
+                        <div class="section-headers">
+                            <h3>We should always update the customer on where they can check the status of their refund</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We assure you that we are doing everything we can to make sure that the refund is processed as soon as possible, 
+                                We truly understand your concern, and we assure you that all the necessary actions have been taken from our end for your tickets. 
+                                The reason why you have not received the refund for the ticket is because we cannot start processing a refund until we have received the funds from the airline. 
+                                You will be notified via a separate email as soon as the rest of the amount has been refunded. 
+                                We totally understand your point of view, however, we would like to assure you that we have already taken all the necessary actions regarding your request
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>We should always update the customer on where they can check the status of their refund</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We totally get how frustrating it can be when things take longer than expected, and we're really sorry if this delay has caused any inconvenience to you.
+                            </div>
+                            <div class="script-card">
+                                Rest assured, we're doing all we can to speed up this refund process. 
+                                Normally, once we get the go-ahead from the airline, we aim to sort it out within about 6 days. 
+                                But sometimes, delays beyond our control can be caused.
+                            </div>
+                            <div class="script-card">
+                                Thanks for bearing with us while we get this sorted. We genuinely appreciate your patience and understanding during this time.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Can you call the airline to prioritize my refund?</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I truly apologize for the inconvenience, while we absolutely understand your concern, 
+                                we have no influence over the airlines' prioritization from our end as they work with an extremely increased workload as well and have their own priorities to meet. 
+                                As a result, the only option is for us to wait for the airline to finalize our request. 
+                                Your patience is highly appreciated.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>The airline said I can have a full refund, why are you saying I can't get a full refund?</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Based on the force majeure guidelines we have received from the airline, 
+                                we cannot proceed with your refund request. If you were informed by the representative of the airline company that you are entitled to a full refund, 
+                                please ask them to insert a note in your booking with the authorization code.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>If refund is still within the timeline</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Appreciate your patience, On average, processing the refund by airline takes about 5 business days, 
+                                followed by an additional 6 days for our internal handling. 
+                                Therefore, you can expect to receive your refund within 10 to 15 business days. 
+                                We are currently facing a high volume of refund requests, and are doing our best to prioritize based on their submission date and other factors.
+                            </div>
+                            <div class="script-card">
+                                Although we are unable to give you a precise time frame, please be assured that we are doing our best to process your request as soon as possible. 
+                                We'll send you an email as soon as your refund is finalized. 
+                                Thank you for your understanding.
+                            </div>
+                        </div>
                     </div>
                 </section>
+                <!--Refund Delays End-->
+                <!--Change Start-->
+                <section id="change-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>Change Breakdown</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Currently, the charges for rebooking, including the tax and/or fare difference are listed below:<br>
+                                Total to pay for change: <span class="manual-edit" data-default-text="Total Change Fee Amount" onclick="enableTextEdit(this)">Total Change Fee Amount</span><br>
+                                -Breakdown of charges-<br>
+                                Airline change fee: <span class="manual-edit" data-default-text="Airline Change Fee" onclick="enableTextEdit(this)">Airline Change Fee</span><br>
+                                Handling fee: <span class="manual-edit" data-default-text="Change Handling Fee" onclick="enableTextEdit(this)">Change Handling Fee</span><br>
+                                Fare difference: <span class="manual-edit" data-default-text="(Change) Fare Difference" onclick="enableTextEdit(this)">(Change) Fare Difference</span><br>
+                                New flight details : <span class="manual-edit" data-default-text="New Flight Details" onclick="enableTextEdit(this)">New Flight Details</span><br><br>
+                                Would you like to proceed with the changes?
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Change request - not-permitted/non-refundable</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I have checked the details of your booking. However, the rules state that this ticket is non-refundable and cannot be changed. 
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>If the customer objects to (not-permitted/non-refundable)</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                We are required to follow the airline's rules for your ticket(s). 
+                                Unfortunately, in this case we are not allowed to make the changes and ticket is not refundable.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>CHG request - permitted ETG</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I’d be happy to help you make the change; however, change fees will apply for this service. 
+                                Allow me check the details for in 5 minutes.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>No changes made ETG - Customer doesn't want to change</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                No problem. Please note that I have not made any changes to your booking. 
+                                If you decide to make this change, contact us again no later than <span class="manual-edit" data-default-text="[deadline]" onclick="enableTextEdit(this)">[deadline]</span>. 
+                                After this date, changes may not be allowed or additional airline fees may apply.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>If customer has an objection on airline costs</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                After this date, changes may not be allowed or additional airline fees may apply.
+                            </div>
+                            <div class="script-card">
+                                The price of a ticket is based on demand and set by the airline – the fare is higher for the date and time you are choosing than the ticket you originally paid for If you are flexible, 
+                                I can search for 2 to 3 different travel dates/times for a lesser fare difference. 
+                                Do you want me to do that?
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Customer objects when referred to the airline</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                As your travel agency, we're here to make your booking experience as smooth as possible and assist with your travel needs. 
+                                While we can help with most inquiries, like itinerary changes and general questions, there are some cases where you'll need to contact the airline directly. 
+                                This is due to airline policies that require their intervention. 
+                                Rest assured, we’ll continue to support you in any way we can to ensure your trip goes smoothly
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>When the customer provides multiple dates to check for pricing</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                I can provide you with only 2 or 3 new travel options for your trip through this channel. 
+                                However, you can find more by checking the cost and flight availability in “My Bookings”, under the “Manage trip” tab. 
+                                If it's not available for your ticket, check the airline's website for your desired dates and prices, then contact our Support. 
+                                Thank you for your understanding.
+                            </div>
+                        </div>
+                        <div class="section-headers">
+                            <h3>Pax doesn't want to proceed to rebooking  or change</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                No problem. Please note that I have not made any changes to your booking.
+                                If you decide to make this change, kindly contact us again no later than <span class="manual-edit" data-default-text="[deadline]" onclick="enableTextEdit(this)">[deadline]</span>.
+                                After this date, changes may not be allowed or additional airline fees may apply.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!--Change End-->
                 <!--Handling Objections-->
                 <section id="objections-section" class="interaction-section">
                     <div class="section-grid">
                         <div class="section-headers">
-                                <h3>Objection on  ETG service fee</h3>
+                            <h3>Objection on  ETG service fee</h3>
                         </div>
                         <div class="section-scripts">
                             <div class="script-card">
@@ -306,8 +548,9 @@
                         </div>
                         <div class="section-scripts">
                             <div class="script-card">
-                                <span>The price of a ticket is based on demand and set by the airline – the fare is higher for the date and time you are choosing than the ticket you originally paid for. 
-                                If you are flexible, I can search for 2 to 3 different travel dates/times for a lesser fare difference. Would you like me to do that?</span>
+                                The price of a ticket is based on demand and set by the airline – the fare is higher for the date and time you are choosing than the ticket you originally paid for. 
+                                If you are flexible, I can search for 2 to 3 different travel dates/times for a lesser fare difference. 
+                                Would you like me to do that?
                             </div>
                         </div>
                         <div class="section-headers">
@@ -354,7 +597,8 @@
                         </div>                          
                     </div>
                 </section>
-                <!-- C-Sat Section -->
+                <!--Handling Objections END-->
+                <!-- C-Sat Section Start-->
                 <section id="csat-scripts-section" class="interaction-section">
                     <div class="section-grid">
                         <div class="section-headers">
@@ -434,14 +678,34 @@
                         </div>
                     </div>
                 </section>
+                <!-- Cancel -->
+                <section id="cancel-section" class="interaction-section">
+                    <div class="section-grid">
+                        <div class="section-headers">
+                            <h3>When the ticket is within 'void' window (no add-ons)</h3>
+                        </div>
+                        <div class="section-scripts">
+                            <div class="script-card">
+                                Thank you for waiting, <span class="manual-edit" data-default-text="[Cx Name]" onclick="enableTextEdit(this)">[Cx Name]</span>. I'm very happy to inform you we can cancel the reservation as it's still under same-day booking and you can have the refund less the handling fee from our end. 
+                                The rest of the amount will be refunded back.
+                            </div>
+                            <div class="script-card">
+                                Thank you for waiting, <span class="manual-edit" data-default-text="[Cx Name]" onclick="enableTextEdit(this)">[Cx Name]</span>. I'm very happy to inform you we can cancel the reservation as it's still under same- day booking and you can have the refund less the handling fee from our end.<br>
+                                I have checked and you have some add-on products as well which can't be refunded after cancellation.<br>
+                                These products are:<br>
+                                <span class="manual-edit" data-default-text="Refundable Add on Products" onclick="enableTextEdit(this)">Refundable Add on Products</span><br>
+                                The rest of the amount will be refunded back. <br>
+                                Would you like to proceed with the cancellation?
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 <!-- More sections can be added similarly -->
             </div>
         </main>
-
         <!-- Tooltip -->
         <div id="tooltip" class="tooltip">Copied!</div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
